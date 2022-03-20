@@ -11,13 +11,13 @@ FIRST_INDEX = 5
 
 def get_counts_from_table(name='db.xlsx'):
     wb = openpyxl.load_workbook(name)
-    wb.active = 2
+    if name != 'поставка.xlsx': 
+        wb.active = 2
     ws = wb.active
     values = []
     for row in ws.rows:
 
         try:
-
             value = str(row[0].value)
             if value.isdigit():
                 values.append(value)
@@ -92,6 +92,7 @@ def insert_sales(filename):
         get_counts_from_table(filename), first_index=FIRST_INDEX, fill=fill)
 
 def insert_supplie(filename):
+    print(filename)
     fill = PatternFill(start_color="92D050", end_color="92D050", fill_type="solid")
     return insert_data_in_table(
         get_counts_from_table(filename), first_index=FIRST_INDEX+33, fill=fill) 
