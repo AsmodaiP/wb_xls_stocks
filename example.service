@@ -1,0 +1,16 @@
+[Unit]
+Description=bot for worcking with stocks
+After=network.target
+
+[Service]
+User=root
+EnviromentFile=/etc/environment
+ExecStart=/home/asmodai/wb_xls_stocks/venv/bin/python bot.py
+ExecReload=/home/asmodai/wb_xls_stocks/venv/bin/python bot.py
+WorkingDirectory=/home/asmodai/wb_xls_stocks/
+KillMode=process
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
