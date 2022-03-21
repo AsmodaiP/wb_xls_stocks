@@ -8,13 +8,14 @@ from dotenv import load_dotenv
 from telegram.ext import (CommandHandler, ConversationHandler, Filters,
                           MessageHandler, Updater)
 from telegram import KeyboardButton, ReplyKeyboardMarkup
+from google_sheet import update_google_sheet
 
 import sheet
 
 load_dotenv()
 
 MAIN_MENU = (
-    [KeyboardButton('Получить таблицу'),],)
+    [KeyboardButton('Получить таблицу'), ],)
 
 MAIN_MENU_MARKUP = ReplyKeyboardMarkup(
     MAIN_MENU,
@@ -62,6 +63,7 @@ def send_old_table(bot, update):
 def send_new_table(bot, update):
     bot.message.reply_text('Актуальная таблица')
     bot.message.reply_document(open('stocks.xlsx', 'rb'))
+    update_google_sheet()
 
 
 def file_manager(bot, update):
@@ -128,7 +130,10 @@ document_handler = MessageHandler(
     Filters.document.file_extension("xlsx"),
     file_manager)
 
-get_table_handler = MessageHandler(Filters.text(['Получить таблицу']), send_new_table)
+get_table_handler = MessageHandler(
+    Filters.text(
+        ['Получить таблицу']),
+    send_new_table)
 updater.dispatcher.add_handler(get_table_handler)
 
 dialog = ConversationHandler(
