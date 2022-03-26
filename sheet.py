@@ -75,7 +75,6 @@ def insert_data_in_table(data, first_index,fill, target_table='stocks.xlsx'):
 def get_sum_by_barcode(mirrors_barcodes, data, row):
     sum_of_mirrors = 0
     for bar in mirrors_barcodes:
-
         if str(bar) in data:
             sum_of_mirrors += data[str(bar)]
             del data[str(bar)]
@@ -92,11 +91,10 @@ def insert_sales(filename):
         get_counts_from_table(filename), first_index=FIRST_INDEX, fill=fill)
 
 def insert_supplie(filename):
-    print(filename)
     fill = PatternFill(start_color="92D050", end_color="92D050", fill_type="solid")
     return insert_data_in_table(
         get_counts_from_table(filename), first_index=FIRST_INDEX+33, fill=fill) 
 
 # 2000393474004
 if __name__ == '__main__':
-    pass
+    print(get_counts_from_table())
