@@ -11,6 +11,7 @@ from telegram import KeyboardButton, ReplyKeyboardMarkup
 from google_sheet import update_google_sheet
 
 import sheet
+import ggl_sheet
 
 load_dotenv()
 
@@ -51,7 +52,7 @@ def start(bot, update):
     bot.message.reply_text(
         codecs.open(
             'instruction.md',
-            'r').read(),
+            'r', 'utf-8').read(),
         parse_mode='Markdown', reply_markup=MAIN_MENU_MARKUP)
 
 
@@ -72,42 +73,19 @@ def file_manager(bot, update):
     нужно ли добавить остатки из этого файла,
     обновить основную табилцу или внести приход
     '''
-    send_old_table(bot, update)
     file_id = bot.message.document['file_id']
     name = bot.message.document['file_name']
-    if name == 'stocks.xlsx':
-        update.user_data['file_id'] = file_id
-        bot.message.reply_text(
-            'Введите ДА для подтверждения замены главного файла')
-        return 'update_main_file_confirmation'
     file = update.bot.get_file(file_id)
     file.download(name)
     if name == 'поставка.xlsx':
         update.user_data['file_id'] = file_id
-        sdfsd = sheet.insert_supplie(name)
-        logging.info(sdfsd)
-        result = sheet.insert_supplie(name)['erorrs']
+        result = ggl_sheet.insert_supplie(name)['erorrs']
     else:
-        result = list(sheet.insert_sales(name)['erorrs'])
-    send_new_table(bot, update)
+        result = list(ggl_sheet.insert_sales(name)['erorrs'])
     if result:
         bot.message.reply_text('Этих артикулов  нет в таблице. Скорее всего нужно добавить их и их актуальный остаток в файл и провести замену главного файла\n'
                                +
                                '\n'.join(result), parse_mode='Markdown')
-    return ConversationHandler.END
-
-
-def update_main_file(bot, update):
-    '''Обновляет главный файл и отправляет его пользователю'''
-    if bot.message.text.lower() != 'да':
-        bot.message.reply_text('Замена главного файла отменена')
-        return ConversationHandler.END
-
-    file_id = update.user_data['file_id']
-    name = 'stocks.xlsx'
-    file = update.bot.get_file(file_id)
-    file.download(name)
-    send_new_table(bot, update)
     return ConversationHandler.END
 
 
@@ -123,26 +101,17 @@ start_handler = CommandHandler('start', start)
 updater.dispatcher.add_handler(start_handler)
 
 
-update_main_file_handler = MessageHandler(
-    Filters.text & ~Filters.command, update_main_file)
 
 document_handler = MessageHandler(
     Filters.document.file_extension("xlsx"),
     file_manager)
 
-get_table_handler = MessageHandler(
-    Filters.text(
-        ['Получить таблицу']),
-    send_new_table)
-updater.dispatcher.add_handler(get_table_handler)
+# get_table_handler = MessageHandler(
+#     Filters.text(
+#         ['Получить таблицу']),
+#     send_new_table)
+# updater.dispatcher.add_handler(get_table_handler)
 
-dialog = ConversationHandler(
-    entry_points=[document_handler],
-    states={
-        'update_main_file_confirmation': [MessageHandler(Filters.text & ~Filters.command, update_main_file)],
-    },
-    fallbacks=[CommandHandler('cancel', cancel)])
-
-updater.dispatcher.add_handler(dialog)
+updater.dispatcher.add_handler(document_handler)
 
 updater.start_polling()
