@@ -85,11 +85,8 @@ def file_manager(bot, update):
         bot.message.reply_text('Этих артикулов  нет в таблице. Скорее всего нужно добавить их и их актуальный остаток в файл и провести замену главного файла\n'
                                +
                                '\n'.join(result), parse_mode='Markdown')
-<<<<<<< HEAD
-=======
     else:
         bot.message.reply_text('OK')
->>>>>>> af7480a87b97e4ecc1191e3f1f5b7f180c477094
     return ConversationHandler.END
 
 
@@ -110,20 +107,13 @@ document_handler = MessageHandler(
     Filters.document.file_extension("xlsx"),
     file_manager)
 
-<<<<<<< HEAD
-# get_table_handler = MessageHandler(
-#     Filters.text(
-#         ['Получить таблицу']),
-#     send_new_table)
-# updater.dispatcher.add_handler(get_table_handler)
-=======
 get_table_handler = MessageHandler(
     Filters.text(
         ['Получить таблицу']),
     send_new_table)
 updater.dispatcher.add_handler(get_table_handler)
->>>>>>> af7480a87b97e4ecc1191e3f1f5b7f180c477094
 
 updater.dispatcher.add_handler(document_handler)
 
 updater.start_polling()
+ 
