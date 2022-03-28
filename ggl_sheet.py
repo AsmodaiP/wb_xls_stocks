@@ -95,7 +95,8 @@ def insert_data_in_table(data, spreadsheet_id, first_index=FIRST_INDEX):
         body = {
         'valueInputOption': 'USER_ENTERED',
         'data': body_data}
-    print(body_data)
+    if data:
+        return {'erorrs': data}
     sheet.values().batchUpdate(spreadsheetId=spreadsheet_id, body=body).execute()
     return {'erorrs': data}
 
