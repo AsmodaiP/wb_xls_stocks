@@ -51,6 +51,7 @@ def get_sum_by_barcode(mirrors_barcodes, data, row, first_index=FIRST_INDEX):
         sum_of_mirrors = int(data[barcode])
         del data[str(barcode)]
     print(row)
+    logging.info(row)
     today_sells = row[first_index + datetime.now().day-1]
     if today_sells is not None and today_sells  != '':
         return sum([int(today_sells), sum_of_mirrors])
@@ -86,7 +87,12 @@ def insert_data_in_table(data, spreadsheet_id, first_index=FIRST_INDEX):
         values = result.get('values', [])
         i = 1
         for row in values:
-            bar = row[0]
+            logging.info(row)
+            try:
+                bar = row[0]
+            except:
+                i+=1
+                continue
             if bar in data:
                 new_value = get_sum_by_barcode(mirrors, data, row, first_index) 
                 print(new_value)
