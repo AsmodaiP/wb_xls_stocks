@@ -28,7 +28,8 @@ START_POSITION_FOR_PLACE = 14
 FIRST_INDEX = 6
 
 load_dotenv()
-SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID_FOR_STOCKS')
+SPREADSHEET_ID_STOCKS = os.environ.get('SPREADSHEET_ID_FOR_STOCKS')
+SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID')
 
 def get_sheetnames(spreadsheet_id):
     service = build('sheets', 'v4', credentials=credentials)
@@ -109,14 +110,57 @@ def insert_data_in_table(data, spreadsheet_id, first_index=FIRST_INDEX):
         
 def insert_sales(filename):
     return insert_data_in_table(
-        get_counts_from_table(filename), first_index=FIRST_INDEX, spreadsheet_id=SPREADSHEET_ID)
+        get_counts_from_table(filename), first_index=FIRST_INDEX, spreadsheet_id=SPREADSHEET_ID_STOCKS)
 
 def insert_supplie(filename):
     return insert_data_in_table(
-        get_counts_from_table(filename), first_index=FIRST_INDEX+33, spreadsheet_id=SPREADSHEET_ID) 
+        get_counts_from_table(filename), first_index=FIRST_INDEX+33, spreadsheet_id=SPREADSHEET_ID_STOCKS) 
+
+
+def get_all_data_from_google_sheet(spreadsheet_id=SPREADSHEET_ID_STOCKS):
+    service = build('sheets', 'v4', credentials=credentials)
+    sheet = service.spreadsheets()
+    sheetnames = get_sheetnames(spreadsheet_id)
+    data= []
+    for sheetname in sheetnames:
+        if sheetname == 'Зеркала':
+            continue
+        result = sheet.values().get(spreadsheetId=spreadsheet_id,
+                            range=f'{sheetname}!A:BS', majorDimension='ROWS').execute()
+        values = result.get('values', [])
+        
+        for row in values:
+            try:
+                if len(row[0]) > 3 and row[0].isdigit():
+                    data.append((row[0], row[1], row[5]))
+            except:
+                pass
+    return data
+
+def update_table_with_sum(source_id=SPREADSHEET_ID_STOCKS, target_id=SPREADSHEET_ID):
+    data = get_all_data_from_google_sheet(source_id)
+    i = 2
+    body_data = []
+    for barcode, article, stock in data:
+        body_data.append([
+            {'range': f'Баркоды!A{i}', 'values': [[barcode]]},
+            {'range': f'Баркоды!B{i}', 'values': [[article]]},
+            {'range': f'Баркоды!C{i}', 'values': [[stock]]},
+            ])
+        i+=1
+    service = build('sheets', 'v4', credentials=credentials)
+    sheet = service.spreadsheets()
+    body = {
+        'valueInputOption': 'USER_ENTERED',
+        'data': body_data}
+    sheet.values().batchUpdate(spreadsheetId=target_id, body=body).execute()
+
+
+
 
 if __name__ == '__main__':
-    pass
+    # get_all_data_from_google_sheet()
+    update_table_with_sum()
     # service = build('sheets', 'v4', credentials=credentials)
     # sheet = service.spreadsheets()
     # sheet_metadata = sheet.get(spreadsheetId=SPREADSHEET_ID).execute()

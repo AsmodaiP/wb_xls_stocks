@@ -87,6 +87,7 @@ def file_manager(bot, update):
                                '\n'.join(result), parse_mode='Markdown')
     else:
         bot.message.reply_text('OK')
+    ggl_sheet.update_table_with_sum()
     return ConversationHandler.END
 
 
