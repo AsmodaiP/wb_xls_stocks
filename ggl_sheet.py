@@ -53,7 +53,10 @@ def get_sum_by_barcode(mirrors_barcodes, data, row, first_index=FIRST_INDEX):
         del data[str(barcode)]
     print(row)
     logging.info(row)
-    today_sells = row[first_index + datetime.now().day-1]
+    try:
+        today_sells = row[first_index + datetime.now().day-1]
+    except:
+        today_sells = 0
     if today_sells is not None and today_sells  != '':
         return sum([int(today_sells), sum_of_mirrors])
     return sum_of_mirrors
