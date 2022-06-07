@@ -1,4 +1,5 @@
 import codecs
+import json
 import logging
 import os
 import sys
@@ -62,8 +63,15 @@ def send_old_table(bot, update):
 
 
 def send_new_table(bot, update):
-    bot.message.reply_text(f'https://docs.google.com/spreadsheets/d/{ggl_sheet.SPREADSHEET_ID}/')
-    update_google_sheet()
+    with open('credentials.json', 'r') as f:
+        cred = json.load(f)
+    msg = ''
+    for name, info in cred.items():
+        spreadsheet_id = info.get('stocks_id')
+        if spreadsheet_id:
+            msg += f'{name} -- https://docs.google.com/spreadsheets/d/{spreadsheet_id}/ \n'
+    bot.message.reply_text(msg)
+    # update_google_sheet()
 
 
 def file_manager(bot, update):

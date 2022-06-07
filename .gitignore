@@ -1,5 +1,6 @@
 *.log.*
 credentials_service.json
+credentials.json
 *.xlsx
 .vscode/
 # Byte-compiled / optimized / DLL files
